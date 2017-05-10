@@ -1,6 +1,5 @@
 import java.io.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Scanner;
 
 public class Tail {
 
@@ -12,59 +11,95 @@ public class Tail {
         this.stringNumber = stringNumber;
     }
 
-    private List<String> getChars(InputStream in) throws IOException{
-        List<Character> reader = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(in))){
+    public void getChars(String inputFile, String outputFile) throws Exception {
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(inputFile))) {
             int c;
-            int count = 0;
-            while((c = br.read())!= -1){
-                reader.add((char) c);
-                count++;
+            while ((c = br.read()) != -1) {
+                sb.append((char) c);
             }
+        } catch (Exception ex) {
+            if (inputFile == null) {
+                sb = noInputFile();
+            } else throw new IllegalArgumentException("имя входного файла указано неверно");
         }
-        List<String> result = new ArrayList<>();
-        char[] readerC = new char[reader.size()];
-        for(int j = 0; j < readerC.length; j++) {
-            readerC[j] = reader.get(j);
+        int num = this.charNumber;
+        StringBuilder sb2 = new StringBuilder();
+        for (int i = sb.length() - 1; num > 0 && i >= 0; i--) { // если файл меньше заданного числа символов, выводится весь файл
+            sb2.append(sb.charAt(i));
+            if (sb.charAt(i) != '\n' && sb.charAt(i) != '\r') num--;
         }
-        String readerS = new String(readerC);
-        result.add(charNumber, readerS);
-        return result;
-    }
-
-    private List<String> getStrings(InputStream in) throws IOException{
-        List<String> reader = new ArrayList<>();
-        try (BufferedReader br = new BufferedReader(new InputStreamReader(in))){
+        sb2.reverse();
+        StringBuilder sb3 = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(outputFile))) {
             String s;
-            int count = 0;
-            while((s = br.readLine())!= null){
-                reader.add((String) s);
-                count++;
+            while ((s = br.readLine()) != null) {
+                sb3.append(s);
+                sb3.append("\r\n");
             }
+        } catch (Exception ex) {
+            if (outputFile == null) {
+                System.out.println("отсутсвует выходной файл");
+            } else throw new IllegalArgumentException("имя выходного файла указано неверно");
         }
-        List<String> result = new ArrayList<>();
-        for (int i = 0; i < reader.size() - 1; i ++) {
-            result.add(stringNumber, reader.get(i));
+        try (FileWriter writer = new FileWriter(outputFile)) {
+            writer.append(sb3.toString() + sb2.toString());
+            writer.flush();
+        } catch (Exception e) {
+            System.out.println(sb2);
         }
-        return result;
+
     }
 
-    public List<String> getTail(InputStream in) throws IOException {
-        List<String> result = new ArrayList<>();
-        if (charNumber > 0) {
-            result.addAll(getChars(in));
-            return result;
+    private StringBuilder noInputFile() {
+        StringBuilder sb = new StringBuilder();
+        System.out.println("введите текст");
+        Scanner in = new Scanner(System.in);
+        for (int i = 0; i < 10; i++) {
+            sb = sb.append(in.nextLine() + "\r\n");
         }
-        if (stringNumber > 0) {
-            result.addAll(getStrings(in));
-            return result;
-        }
-        return result;
+        return sb;
     }
 
-    public String fromFile(String inputFile) throws IOException {
-        try (FileInputStream inputStream = new FileInputStream(inputFile)) {
-            return getTail(inputStream).toString();
+    public void getStrings(String inputFile, String outputFile) throws Exception {
+        StringBuilder sb = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(inputFile))) {
+            String s;
+            while ((s = br.readLine()) != null) {
+                sb.append(s);
+                sb.append("\r\n");
+            }
+        } catch (Exception ex) {
+            if (inputFile == null) {
+                sb = noInputFile();
+            } else throw new IllegalArgumentException("имя входного файла указано неверно");
         }
+        int num = this.stringNumber + 1;
+        StringBuilder sb2 = new StringBuilder();
+        for (int i = sb.length() - 1; num > 0 && i >= 0; i--) {   // если файл меньше заданного числа строк, выводится весь файл
+            sb2.append(sb.charAt(i));
+            if (sb.charAt(i) == '\n' && sb.charAt(i - 1) == '\r') num--;
+        }
+        sb2.reverse();
+        StringBuilder sb3 = new StringBuilder();
+        try (BufferedReader br = new BufferedReader(new FileReader(outputFile))) {
+            String s;
+            while ((s = br.readLine()) != null) {
+                sb3.append(s);
+                sb3.append("\r\n");
+            }
+        } catch (Exception ex) {
+            if (outputFile == null) {
+                System.out.println("отсутсвует выходной файл");
+            } else throw new IllegalArgumentException("имя выходного файла указано неверно");
+        }
+        try (FileWriter writer = new FileWriter(outputFile)) {
+            writer.append(sb3.toString() + sb2.toString());
+            writer.flush();
+        } catch (Exception e) {
+            System.out.println(sb2);
+        }
+
+
     }
 }
