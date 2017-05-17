@@ -4,10 +4,8 @@ import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
 import java.io.FileWriter;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Scanner;
 
 class TailLauncher {
 
@@ -71,8 +69,8 @@ class TailLauncher {
         for (String file : inputFiles) {
             if (inputFiles.size() == 1) {
                 if (charNumber != null) {
-                    tail.getChars(file);
-                } else tail.getStrings(file);
+                    sb.append(tail.getChars(file));
+                } else sb.append(tail.getStrings(file));
             } else {
                 if (charNumber != null) {
                     sb.append(file + "\r\n" + tail.getChars(file) + "\r\n");
