@@ -3,10 +3,11 @@ import org.kohsuke.args4j.CmdLineException;
 import org.kohsuke.args4j.CmdLineParser;
 import org.kohsuke.args4j.Option;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import java.io.FileWriter;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Scanner;
 
 class TailLauncher {
 
@@ -20,7 +21,7 @@ class TailLauncher {
     private Integer stringNumber = null;
 
     @Argument(metaVar = "InputName", usage = "Input file name")
-    private List<String> inputFiles = null;
+    private List<String> inputFiles = new ArrayList<String>();
 
 
     public static void main(String[] args) throws Exception {
@@ -43,35 +44,49 @@ class TailLauncher {
             throw new IllegalArgumentException("-c and -n can't be used together");
 
         }
+
         if (charNumber == null && stringNumber == null) {
             charNumber = null;
             stringNumber = 10;
         }
 
-        Tail tail = new Tail(charNumber, stringNumber);
+        if (stringNumber != null && stringNumber < 0) {
+            throw new IllegalArgumentException("String number must be positive");
+        }
+        if (charNumber != null && charNumber < 0) {
+            throw new IllegalArgumentException("Char number must be positive");
+        }
 
+        Tail tail = new Tail(charNumber, stringNumber);
+        StringBuilder sb = new StringBuilder();
+
+
+
+        if (inputFiles.isEmpty()) {
+            if (charNumber != null) {
+                sb.append(tail.getChars(null));
+            } else sb.append(tail.getStrings(null));
+        }
 
         for (String file : inputFiles) {
             if (inputFiles.size() == 1) {
                 if (charNumber != null) {
-                    tail.getChars(file, outputFile);
-                } else tail.getStrings(file, outputFile);
+                    tail.getChars(file);
+                } else tail.getStrings(file);
             } else {
-                StringBuilder sb = new StringBuilder();
-                try (BufferedReader br = new BufferedReader(new FileReader(outputFile))) {
-                    String s;
-                    while ((s = br.readLine()) != null) {
-                        sb.append(s);
-                        sb.append("\r\n");
-                    }
-                    try (FileWriter writer = new FileWriter(outputFile)) {
-                        writer.append(sb.toString() + "\r\n" + file);
-                    }
-                    if (charNumber != null) {
-                        tail.getChars(file, outputFile);
-                    } else tail.getStrings(file, outputFile);
-                }
+                if (charNumber != null) {
+                    sb.append(file + "\r\n" + tail.getChars(file) + "\r\n");
+                } else sb.append(file + "\r\n" + tail.getStrings(file) + "\r\n");
             }
+        }
+
+        try (FileWriter writer = new FileWriter(outputFile)) {
+            writer.append(sb.toString());
+        } catch (Exception ex) {
+            if (outputFile == null) {
+                System.out.println(sb.toString());
+            } else throw new IllegalArgumentException("ошибка записи файла");
         }
     }
 }
+
