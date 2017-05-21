@@ -56,8 +56,12 @@ class TailLauncher {
         }
 
         Tail tail = new Tail(charNumber, stringNumber);
+
         StringBuilder sb = new StringBuilder();
 
+        final boolean haveOneInput = inputFiles.size() == 1;
+
+        final boolean shouldPrintFileNames = !haveOneInput;
 
 
         if (inputFiles.isEmpty()) {
@@ -67,15 +71,13 @@ class TailLauncher {
         }
 
         for (String file : inputFiles) {
-            if (inputFiles.size() == 1) {
-                if (charNumber != null) {
-                    sb.append(tail.getChars(file));
-                } else sb.append(tail.getStrings(file));
-            } else {
-                if (charNumber != null) {
-                    sb.append(file + "\r\n" + tail.getChars(file) + "\r\n");
-                } else sb.append(file + "\r\n" + tail.getStrings(file) + "\r\n");
+            if (shouldPrintFileNames) {
+                sb.append(file).append("\r\n");
             }
+            if (charNumber != null) {
+                sb.append(tail.getChars(file));
+            } else sb.append(tail.getStrings(file));
+            sb.append("\r\n");
         }
 
         try (FileWriter writer = new FileWriter(outputFile)) {

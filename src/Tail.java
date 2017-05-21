@@ -59,7 +59,7 @@ public class Tail {
         StringBuilder sb2 = new StringBuilder();
         for (int i = sb.length() - 1; num > 0 && i >= 0; i--) {   // если файл меньше заданного числа строк, выводится весь файл
             sb2.append(sb.charAt(i));
-            if (sb.charAt(i) == '\n' && sb.charAt(i - 1) == '\n') num--;
+            if (sb.charAt(i) == '\n' && sb.charAt(i - 1) == '\r') num--;
         }
         sb2.reverse();
         return sb2.toString();
