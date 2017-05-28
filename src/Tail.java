@@ -37,7 +37,7 @@ public class Tail {
         StringBuilder sb = new StringBuilder();
         Scanner in = new Scanner(System.in);
         for (int i = 0; i < 10; i++) {
-            sb = sb.append(in.nextLine() + "\n");
+            sb = sb.append(in.nextLine()).append("\n");
         }
         return sb;
     }

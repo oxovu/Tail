@@ -1,0 +1,5 @@
+tests/input1.txt
+ell my love now
+Hey yeah yeah... oh yeah.
+tests/input2.txt
+me in the dirt, let me be with the stars
